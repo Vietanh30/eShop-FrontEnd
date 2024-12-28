@@ -1,0 +1,8 @@
+.thumbnail .keen-slider__slide.active {
+    background: linear-gradient(to right, #009a82, #00483D);
+}
+
+.keen-slider__slide.active .keen-slider__name, .keen-slider__slide.active .keen-slider__description {
+    color: #fff;
+}
+  
