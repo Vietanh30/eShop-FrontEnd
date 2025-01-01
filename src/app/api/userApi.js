@@ -32,16 +32,10 @@ export const signUp = async (formValue) => {
 
 export const getProfile = async (token) => {
   try {
-    // const res = await axios({
-    //   method: "get",
-    //   url: `${host}/api/user`,
-    //   headers: { Authorization: `Bearer ${token}` },
-    // });
-
     const res = await axios.get(`${host}/api/user`, {
       method: "GET",
       headers: { Authorization: `Bearer ${token}` },
-    })
+    });
     return res.data;
   } catch (error) {
     return error.response.data;
@@ -65,7 +59,6 @@ export const updateProfile = async (token, formValue) => {
   }
 };
 
-
 export const getAllProfile = async (token) => {
   try {
     const res = await axios({
@@ -85,13 +78,14 @@ export const updateRole = async (token, status, userId) => {
       method: "patch",
       url: `${host}/api/user/role/${userId}`,
       data: {
-        status: status
+        status: status,
       },
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/x-www-form-urlencoded",
       },
     });
+    console.log(res);
     return res.data;
   } catch (error) {
     return error.response.data;

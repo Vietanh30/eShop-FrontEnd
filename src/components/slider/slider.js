@@ -15,37 +15,36 @@ import slider5 from "../../../src/image/slider/slider5.jpg";
 
 const sliderItem = [
   {
-    name: "Sony WF-1000XM5",
-    description: "Ưu đãi tháng 11",
+    id: "1",
+    name: "Máy lọc nước RO",
+    description: "Tuyệt tác từ nguồn sống",
     img: slider1,
-    link: "/product/tai-nghe-khong-day-sony-wf-1000xm5-chinh-hang",
   },
   {
-    name: "Marshall Motif II ANC",
-    description: "Tái hiện âm thanh sân khấu",
+    id: "2",
+    name: "Máy lọc nước Hòa Phát",
+    description: "Bền bỉ và nước sạch",
     img: slider2,
-    link: "/product/tai-nghe-khong-day-marshall-motif-ii-anc-chinh-hang",
   },
   {
-    name: "Tăng cường hiệu suất với 9Fit",
-    description: "Sản phẩm phụ kiện mới",
+    id: "3",
+    name: "Máy lọc nước Karon",
+    description: "Chuẩn nước uống tinh khiết",
     img: slider3,
-    link: "/cate/accessory",
   },
   {
-    name: "Đồng hồ KIESLECT - Chính hãng",
-    description: "Đa tính năng - Đa tiện ích",
+    id: "4",
+    name: "Máy học nước KAROFI",
+    description: "An tâm toàn diện",
     img: slider4,
-    link: "/cate/kieslect",
   },
   {
-    name: "Redmi Note 12",
-    description: "Giá siêu ưu đãi, chỉ từ 3.890.000đ",
+    id: "5",
+    name: "Máy lọc nước Smart",
+    description: "Sản phẩm chất lượng hàng đầu Việt Nam",
     img: slider5,
-    link: "/product/redmi-note-12-4gb-128gb-chinh-hang",
   },
 ];
-
 function ThumbnailPlugin(mainRef) {
   return (slider) => {
     function removeActive() {
@@ -97,7 +96,7 @@ const Slider = () => {
           if (mouseOver) return;
           timeout = setTimeout(() => {
             slider.next();
-          }, 3000);
+          }, 5000);
         }
         slider.on("created", () => {
           slider.container.addEventListener("mouseover", () => {
@@ -132,13 +131,12 @@ const Slider = () => {
     <div className="max-[600px]:hidden mx-24 my-6">
       <div ref={sliderRef} className="keen-slider">
         {sliderItem.map((item, index) => (
-          <Link href={item.link} key={index}>
-            <Image
-              className="keen-slider__slide rounded-lg cursor-pointer"
-              src={item.img}
-              alt={item.name}
-            />
-          </Link>
+          <Image
+            key={item.id}
+            className="keen-slider__slide rounded-lg cursor-pointer"
+            src={item.img}
+            alt={item.name}
+          />
         ))}
       </div>
 

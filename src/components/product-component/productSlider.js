@@ -63,16 +63,19 @@ const ProductSlider = ({ product }) => {
   return (
     <div className="max-[600px]:w-full w-[28%]">
       <Image
-        className="max-[600px]:mx-auto rounded-lg h-[320px] object-cover"
+        className="max-[600px]:mx-auto rounded-lg h-[320px] w-[90%] object-cover"
         src={item ?? product?.image?.[0]}
         alt={product?.image?.[0]}
         width={200}
         height={200}
       />
-      <div className="flex gap-x-2 overflow-x-auto w-full">
-      {
-        product?.image?.slice(0,4)?.map((item) => (
-          <div className="border border-green-200 rounded-xl w-1/4 cursor-pointer" onClick={() => setItem(item)}>
+      <div className="flex gap-x-2 overflow-x-auto w-full mt-2">
+        {product?.image?.slice(0, 4)?.map((item, index) => (
+          <div
+            className="border border-green-200 rounded-xl w-1/4 cursor-pointer"
+            onClick={() => setItem(item)}
+            key={index}
+          >
             <Image
               className="object-cover"
               src={item}
@@ -81,8 +84,7 @@ const ProductSlider = ({ product }) => {
               height={200}
             />
           </div>
-        ))
-      }
+        ))}
       </div>
       {/* <div ref={sliderRef} className="keen-slider">
         {product &&

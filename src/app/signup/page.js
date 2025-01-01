@@ -1,9 +1,7 @@
 "use client";
 
 import Image from "next/image";
-
 import loginObj from "../../../src/image/login/login.png";
-import icon from "../../../src/image/logo/icon.png";
 import { ReactNotifications, Store } from "react-notifications-component";
 import "react-notifications-component/dist/theme.css";
 import { useState } from "react";
@@ -12,61 +10,45 @@ import { signUp } from "../api/userApi";
 
 export default function SignUp() {
   const router = useRouter();
-
-  const [formValue, setformValue] = useState({
-    email: "",
-    password: "",
+  const [formValue, setFormValue] = useState({
     name: "",
+    password: "",
+    email: "",
     phoneNumber: "",
-    gender: "",
-    password: ""
+    gender: "Nam",
   });
 
   const handleChange = (event) => {
-    setformValue({
+    setFormValue({
       ...formValue,
       [event.target.name]: event.target.value,
     });
   };
 
   const handleKeyDown = (event) => {
-    if (event.keyCode === 13) {
+    if (event.key === "Enter") {
       handleSubmit();
     }
   };
 
   const handleSubmit = async () => {
     const res = await signUp(formValue);
-    if (res === undefined) {
-      return;
-    } else if (res.message) {
-      Store.addNotification({
-        title: "Đăng ký thất bại",
-        message: res.message,
-        type: "danger",
-        insert: "top",
-        container: "top-right",
-        animationIn: ["animate__animated", "animate__fadeIn"],
-        animationOut: ["animate__animated", "animate__fadeOut"],
-        dismiss: {
-          duration: 3000,
-          onScreen: true,
-        },
-      });
-    } else {
-      Store.addNotification({
-        title: "Đăng ký thành công",
-        message: "Chào mừng đến với E-Mobile Shop",
-        type: "success",
-        insert: "top",
-        container: "top-right",
-        animationIn: ["animate__animated", "animate__fadeIn"],
-        animationOut: ["animate__animated", "animate__fadeOut"],
-        dismiss: {
-          duration: 3000,
-          onScreen: true,
-        },
-      });
+    if (!res) return;
+
+    const notification = {
+      title: res.message ? "Đăng ký thất bại" : "Đăng ký thành công",
+      message: res.message || "Chào mừng đến với E-Mobile Shop",
+      type: res.message ? "danger" : "success",
+      insert: "top",
+      container: "top-right",
+      animationIn: ["animate__animated", "animate__fadeIn"],
+      animationOut: ["animate__animated", "animate__fadeOut"],
+      dismiss: { duration: 3000, onScreen: true },
+    };
+
+    Store.addNotification(notification);
+
+    if (!res.message) {
       router.push("/login");
     }
   };
@@ -75,7 +57,7 @@ export default function SignUp() {
     <>
       <ReactNotifications />
       <div className="flex max-[600px]:flex-col">
-      <div className="relative max-[600px]:h-[200px] h-screen min-w-[60%] bg-gradient-to-b from-[#FFEACB]/80 to-[#FED085]/80">
+        <div className="relative max-[600px]:h-[200px] h-screen min-w-[60%] bg-gradient-to-b from-[#FFEACB]/80 to-[#FED085]/80">
           <Image
             src={loginObj}
             alt=""
@@ -83,18 +65,14 @@ export default function SignUp() {
           />
         </div>
         <div className="mt-16 max-[600px]:mx-0 max-[600px]:px-8 mx-16 w-full">
-          <div className="flex items-center gap-x-4">
-            <div>
-              <p className="text-sm text-black font-bold">CHÀO MỪNG BẠN</p>
-            </div>
-          </div>
-          <div className="pt-6">
-            <form className="">
-              <div className="relative z-0 w-full mb-3 group">
+          <p className="text-sm text-black font-bold">CHÀO MỪNG BẠN</p>
+          <form className="pt-6">
+            {["name", "password", "email", "phoneNumber"].map((field, i) => (
+              <div key={field} className="relative z-0 w-full mb-3 group">
                 <input
-                  type="email"
-                  name="email"
-                  id="email"
+                  type={field === "password" ? "password" : "text"}
+                  name={field}
+                  id={field}
                   className="block py-2.5 px-0 w-full text-xs text-gray-900 bg-transparent border-0 border-b-2 appearance-none dark:text-black dark:border-gray-400 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
                   placeholder=" "
                   onChange={handleChange}
@@ -102,100 +80,56 @@ export default function SignUp() {
                   required
                 />
                 <label
-                  htmlFor="email"
-                  className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+                  htmlFor={field}
+                  className="peer-focus:font-medium peer-focus:mt-2 absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
                 >
-                  Tên đăng nhập
+                  {field === "name"
+                    ? "Tên đăng nhập"
+                    : field === "password"
+                    ? "Mật khẩu"
+                    : field === "email"
+                    ? "Email"
+                    : "Số điện thoại"}
                 </label>
               </div>
-              <div className="relative z-0 w-full mb-3 group">
-                <input
-                  type="password"
-                  name="password"
-                  id="password"
-                  className="block py-2.5 px-0 w-full text-xs text-gray-900 bg-transparent border-0 border-b-2 appearance-none dark:text-black dark:border-gray-400 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                  placeholder=" "
-                  onChange={handleChange}
-                  onKeyDown={handleKeyDown}
-                  required
-                />
-                <label
-                  htmlFor="password"
-                  className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-2 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
-                >
-                  Mật khẩu
-                </label>
-              </div>
-              <div className="relative z-0 w-full mb-3 group">
-                <input
-                  type="text"
-                  name="name"
-                  id="name"
-                  className="block py-2.5 px-0 w-full text-xs text-gray-900 bg-transparent border-0 border-b-2 appearance-none dark:text-black dark:border-gray-400 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                  placeholder=" "
-                  onChange={handleChange}
-                  onKeyDown={handleKeyDown}
-                  required
-                />
-                <label
-                  htmlFor="name"
-                  className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-2 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
-                >
-                  Tên người dùng
-                </label>
-              </div>
-              <div className="relative z-0 w-full mb-3 group">
-                <input
-                  type="text"
-                  name="phoneNumber"
-                  id="phoneNumber"
-                  className="block py-2.5 px-0 w-full text-xs text-gray-900 bg-transparent border-0 border-b-2 appearance-none dark:text-black dark:border-gray-400 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                  placeholder=" "
-                  onChange={handleChange}
-                  onKeyDown={handleKeyDown}
-                  required
-                />
-                <label
-                  htmlFor="phoneNumber"
-                  className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
-                >
-                  Số điện thoại
-                </label>
-              </div>
-              <div className="relative z-0 w-full mb-8 group">
-                <input
-                  type="text"
-                  name="gender"
-                  id="gender"
-                  className="block py-2.5 px-0 w-full text-xs text-gray-900 bg-transparent border-0 border-b-2 appearance-none dark:text-black dark:border-gray-400 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                  placeholder=" "
-                  onChange={handleChange}
-                  onKeyDown={handleKeyDown}
-                  required
-                />
-                <label
-                  htmlFor="gender"
-                  className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
-                >
-                  Giới tính
-                </label>
-              </div>
-              <div
-                className="cursor-pointer text-white bg-gradient-to-b from-[#000000] to-[#009981] hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-xl text-sm w-full px-5 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                onClick={() => handleSubmit()}
+            ))}
+            <div className="relative z-0 w-full mb-8 group">
+              <select
+                name="gender"
+                id="gender"
+                className="block py-2.5 px-0 w-full text-xs text-gray-900 bg-transparent border-0 border-b-2 appearance-none dark:text-black dark:border-gray-400 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                onChange={handleChange}
+                onKeyDown={handleKeyDown}
+                required
               >
-                ĐĂNG KÝ
-              </div>
-            </form>
-          </div>
+                <option value="Nam">Nam</option>
+                <option value="Nữ">Nữ</option>
+                <option value="Giới tính khác">Giới tính khác</option>
+              </select>
+              <label
+                htmlFor="gender"
+                className="peer-focus:font-medium peer-focus:mt-2 absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+              >
+                Giới tính
+              </label>
+            </div>
+            <div
+              className="cursor-pointer text-white bg-gradient-to-b from-[#000000] to-[#009981] hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-xl text-sm w-full px-5 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              onClick={handleSubmit}
+            >
+              ĐĂNG KÝ
+            </div>
+          </form>
           <div className="flex justify-between text-xs text-black py-3">
             <p>
               Đã có tài khoản?{" "}
-              <span onClick={() => router.push("/login")} className="cursor-pointer font-medium text-blue-500">
+              <span
+                onClick={() => router.push("/login")}
+                className="cursor-pointer font-medium text-blue-500"
+              >
                 Đăng nhập
               </span>
             </p>
-            <p></p>
           </div>
         </div>
       </div>

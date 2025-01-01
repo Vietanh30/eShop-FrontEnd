@@ -1,5 +1,4 @@
 "use client";
-
 import { useState, useEffect } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import Image from "next/image";
@@ -8,42 +7,14 @@ import Link from "next/link";
 import Header from "@/components/header/header";
 import Footer from "@/components/footer/footer";
 import Slider from "@/components/slider/slider";
-import HomeTitle from "@/components/home-component/homeTitle";
+// import HomeTitle from "@/components/home-component/homeTitle";
 import ScrollButton from "@/components/button/scrollBtn";
-import ChatBotButton from "@/components/button/chatBotBtn";
 import Benefit from "@/components/benefit/benefit";
 import NavCate from "@/components/cate-component/navCate";
 import FilterCate from "@/components/cate-component/filterCate";
-
-import {
-  getAllProductsByCate,
-  getAllCates,
-  getAllCateArr,
-} from "@/app/api/productApi";
+import { getProductBySlugCate } from "@/app/api/cateApi";
 
 export default function Cate() {
-  const getCateSequence = (pathname, cates) => {
-    let res = [];
-    while (true) {
-      const item = res.length
-        ? cates.filter((e) => e.slug === res[res.length - 1].parent.slug)[0]
-        : cates.filter((e) => e.slug === pathname)[0];
-      res.push(item);
-
-      if (!item.parent) break;
-    }
-
-    return res;
-  };
-
-  const getCateNameFromCurrCate = (currCate, cateArr) => {
-    let res = cateArr.filter((e) => e.slug === currCate)[0];
-    while (res?.parent) {
-      res = cateArr.filter((e) => e.slug === res.parent.slug)[0];
-    }
-    return res;
-  };
-
   const searchParams = useSearchParams();
   let _sort = searchParams.get("_sort");
   if (_sort !== "asc" && _sort !== "des") _sort = "";
@@ -51,29 +22,20 @@ export default function Cate() {
   if (_filter !== "min5" && _filter !== "max5") _filter = "";
 
   const currCate = usePathname().split("/")[2];
+  console.log("currCate::", currCate);
   const [product, setProduct] = useState([]);
   const [productCst, setProductCst] = useState([]);
-  const [listCateSequences, setListCateSequences] = useState([]);
 
   useEffect(() => {
     (async () => {
-      const cates = await getAllCates();
-      const cateArr = await getAllCateArr();
-      const bigCate = getCateNameFromCurrCate(currCate, cateArr);
-
-      const products = await getAllProductsByCate(bigCate?.bigSlug);
-      console.log(bigCate);
-      let newProducts = products?.filter((product) =>
-        product.cate.some((e) => e.slug === currCate)
+      const products = await getProductBySlugCate(currCate);
+      console.log("products", products);
+      let newProducts = products?.filter(
+        (product) => product.slug === currCate
       );
-      setProduct(newProducts);
+      setProduct(products);
       setProductCst(newProducts);
-
-      const listCateSequence = getCateSequence(
-        currCate,
-        cates[0][bigCate.bigSlug]
-      );
-      setListCateSequences(listCateSequence);
+      console.log("productCst::", productCst);
     })();
   }, []);
 
@@ -110,12 +72,12 @@ export default function Cate() {
   return (
     <>
       <ScrollButton />
-      <ChatBotButton />
+      {/* <ChatBotButton /> */}
 
       <Header />
-      {/* <Slider /> */}
+      <Slider />
 
-      <NavCate listCate={[...listCateSequences].reverse()} />
+      <NavCate listCate={currCate} />
       <FilterCate />
 
       {/* main content */}
@@ -125,7 +87,8 @@ export default function Cate() {
             <Link
               href={`/product/${item.slug}`}
               className="p-2 rounded-xl drop-shadow bg-white group hover:border hover:border-[#f7941e] transition delay-150 duration-300 ease-in-out"
-              key={index}>
+              key={index}
+            >
               <Image
                 src={item.offer.length ? item.configImage : item.image[0]}
                 alt={item.name}

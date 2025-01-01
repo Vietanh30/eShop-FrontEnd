@@ -14,30 +14,6 @@ export const getAllProducts = async () => {
   }
 };
 
-export const getAllCates = async () => {
-  try {
-    const res = await axios({
-      method: "get",
-      url: `${host}/api/product/cate`,
-    });
-    return res.data;
-  } catch (error) {
-    return error.response.data;
-  }
-};
-
-export const getAllCateArr = async () => {
-  try {
-    const res = await axios({
-      method: "get",
-      url: `${host}/api/product/cateArr`,
-    });
-    return res.data;
-  } catch (error) {
-    return error.response.data;
-  }
-};
-
 export const getAllProductsByCate = async (cate, size = -1) => {
   try {
     const res = await axios({
@@ -66,26 +42,18 @@ export const getProductById = async (id) => {
   try {
     const res = await axios({
       method: "get",
-      url: `${host}/api/product/id/${id}`,
+      url: `${host}/api/product/${id}`,
     });
     return res.data;
   } catch (error) {
     return error.response.data;
   }
 };
-
-export const updateProduct = async (id, token, formValue) => {
+export const getProductByCategory = async (id) => {
   try {
     const res = await axios({
-      method: "patch",
-      url: `${host}/api/product/${id}`,
-      data: {
-        data: JSON.stringify(formValue)
-      },
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
+      method: "get",
+      url: `${host}/api/product/cate/${id}`,
     });
     return res.data;
   } catch (error) {

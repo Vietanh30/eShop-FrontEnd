@@ -6,6 +6,15 @@ const nextConfig = {
       "cdn1.hoanghamobile.com",
       "hoanghamobile.com",
       "admin.hoanghamobile.com",
+      "localhost",
+    ],
+    remotePatterns: [
+      {
+        protocol: "http",
+        hostname: "localhost",
+        port: "8000",
+        pathname: "/uploads/**",
+      },
     ],
   },
 };

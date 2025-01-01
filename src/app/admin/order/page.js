@@ -1,13 +1,11 @@
 "use client";
 
 import AdminTab from "@/components/admin/adminTab";
-import Link from "next/link";
-import Image from "next/image";
 import { useState, useEffect } from "react";
 import { getAllOrder, updateStatus } from "@/app/api/orderApi";
 import Modal from "@mui/material/Modal";
 import { useRouter } from "next/navigation";
-import Error from "@/components/error/error";
+import Swal from "sweetalert2";
 
 export default function AdminOrder() {
   const [products, setProducts] = useState([]);
@@ -17,11 +15,6 @@ export default function AdminOrder() {
   const [selectedValue, setSelectedValue] = useState("");
   const [openModal, setOpenModal] = useState(false);
   const [res, setRes] = useState(null);
-  const [formValue, setformValue] = useState({
-    name: "",
-    price: "",
-    image: [],
-  });
 
   const options = [
     { value: "pending", label: "Đang xử lý" },
@@ -30,23 +23,45 @@ export default function AdminOrder() {
   ];
 
   const [token, setToken] = useState(null);
+  const router = useRouter();
 
   useEffect(() => {
-    (async () => {
-      const token_ = localStorage.getItem("user-token");
-      setToken(token_)
-      const listProducts = await getAllOrder(token_);
-      setProductAll(listProducts);
-      setProducts(listProducts.slice(0, 10));
-      setProductLength(listProducts?.length);
-    })();
+    fetchOrders(); // Gọi hàm fetchOrders khi component mount
   }, []);
+
+  const fetchOrders = async () => {
+    const token_ = localStorage.getItem("user-token");
+    setToken(token_);
+    const listProducts = await getAllOrder(token_);
+    setProductAll(listProducts);
+    setProducts(listProducts.slice(0, 10));
+    setProductLength(listProducts?.length);
+  };
 
   useEffect(() => {
     setProducts(productAll?.slice((currentPage - 1) * 10, currentPage * 10));
-  }, [currentPage]);
+  }, [currentPage, productAll]); // Cập nhật khi productAll thay đổi
 
-  const router = useRouter();
+  const handleUpdateStatus = async () => {
+    const token = localStorage.getItem("user-token");
+    const response = await updateStatus(token, selectedValue, res?._id);
+
+    if (response.status === 200) {
+      Swal.fire({
+        title: "Thành công",
+        text: "Cập nhật tình trạng đơn hàng thành công!",
+        icon: "success",
+      });
+      setOpenModal(false);
+      fetchOrders(); // Gọi lại hàm fetchOrders để làm mới danh sách đơn hàng
+    } else {
+      Swal.fire({
+        title: "Lỗi",
+        text: response?.message || "Có lỗi xảy ra!",
+        icon: "error",
+      });
+    }
+  };
 
   return token ? (
     <div className="flex flex-row">
@@ -62,7 +77,7 @@ export default function AdminOrder() {
           <div className="grid grid-cols-4 text-sm border-b-2 py-2">
             <p className="px-4 font-semibold text-black py-3">ID</p>
             <p className="px-4 font-semibold text-primary_color py-3">Method</p>
-            <p className="px-4 font-semibold text-gray-800 py-3">Price</p>
+            <p className="px-4 font-semibold text-gray-800 py-3">Total Price</p>
             <p className="px-4 font-semibold text-primary_color py-3">Status</p>
           </div>
           <div className="h-[400px] overflow-y-auto">
@@ -73,14 +88,16 @@ export default function AdminOrder() {
                 onClick={() => {
                   setRes(item);
                   setOpenModal(true);
+                  setSelectedValue(item.paymentStatus); // Đặt giá trị mặc định cho select
                 }}
               >
                 <p className="px-4 font-semibold py-3 text-black">{item._id}</p>
-
                 <p className="px-4 text-primary_color py-3 line-clamp-2">
                   {item.paymentMethod}
                 </p>
-                <p className="px-4 text-gray-800 py-3">{item.price} đ</p>
+                <p className="px-4 text-gray-800 py-3">
+                  {item.totalPrice.toLocaleString("en-US")} đ
+                </p>
                 <p className="px-4 text-primary_color py-3 line-clamp-2">
                   {item.paymentStatus}
                 </p>
@@ -123,11 +140,16 @@ export default function AdminOrder() {
               {res?.orderList?.map((item) => (
                 <div
                   key={item._id}
-                  className="flex flex-row justify-between border-b-2 border-gray-100 pt-8"
+                  className="flex flex-row justify-between border-b-2 border-gray-100 pt-4"
                 >
+                  <img
+                    src={item.product.image[0]} // Giả định rằng đường dẫn ảnh nằm trong item.product.image
+                    alt={item.product.name}
+                    className="w-20 h-20 object-cover me-2" // Kích thước ảnh có thể điều chỉnh
+                  />
                   <div className="flex flex-col flex-wrap gap-4 w-1/2">
                     <p className="line-clamp-1">
-                      <b>Tên sản phẩm:</b> {item.name}
+                      <b>Tên sản phẩm:</b> {item.product.name}
                     </p>
                     <p>
                       <b>Số lượng:</b> {item.quantity}
@@ -137,11 +159,7 @@ export default function AdminOrder() {
                   <div className="flex flex-col flex-wrap gap-4 w-1/2">
                     <p>
                       <b>Số tiền:</b>{" "}
-                      {item.price.toLocaleString("en-US", {
-                        minimumFractionDigits: 0,
-                        maximumFractionDigits: 0,
-                      })}{" "}
-                      VND
+                      {item.product.price.toLocaleString("en-US")} VND
                     </p>
                     <p>
                       <b>Màu:</b> {item.color}
@@ -151,15 +169,17 @@ export default function AdminOrder() {
               ))}
             </div>
             <div className="flex gap-x-2 items-center my-8">
-              <p className="text-gray-800 text-sm">Cập nhật tình trạng đơn hàng: </p>
+              <p className="text-gray-800 text-sm">
+                Cập nhật tình trạng đơn hàng:{" "}
+              </p>
               <div>
                 <select
-                  // value={selectedValue}
+                  value={selectedValue}
                   onChange={(e) => setSelectedValue(e.target.value)}
                   className="text-sm text-primary_color border px-2 py-1"
                 >
                   {options.map((option) => (
-                    <option key={option.value} value={option.value} selected={res?.paymentStatus === option.value}>
+                    <option key={option.value} value={option.value}>
                       {option.label}
                     </option>
                   ))}
@@ -172,12 +192,7 @@ export default function AdminOrder() {
             <button
               className="block bg-teal-400 hover:bg-teal-600 text-white uppercase text-lg mx-auto p-2 rounded"
               type="submit"
-              onClick={async () => {
-                const token = localStorage.getItem("user-token");
-                await updateStatus(token, selectedValue, res?._id);
-                setOpenModal(!openModal);
-                router.push("/admin");
-              }}
+              onClick={handleUpdateStatus}
             >
               Update
             </button>
@@ -191,7 +206,5 @@ export default function AdminOrder() {
         </div>
       </Modal>
     </div>
-  ) : (
-    <Error />
-  );
+  ) : null; // Không hiển thị Error
 }

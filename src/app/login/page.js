@@ -32,8 +32,9 @@ export default function Login() {
   };
 
   const handleSubmit = async () => {
+    console.log("res", formValue);
     const res = await signIn(formValue);
-
+    console.log("res", res);
     if (res === undefined) {
       return;
     } else if (res.message) {
@@ -65,7 +66,12 @@ export default function Login() {
         },
       });
       localStorage.setItem("user-token", res.token);
-      router.push("/");
+      localStorage.setItem("user-role", res.roleUser);
+      if (res.roleUser === "admin") {
+        router.push("/admin");
+      } else {
+        router.push("/");
+      }
     }
   };
 
@@ -101,9 +107,9 @@ export default function Login() {
                 />
                 <label
                   htmlFor="email"
-                  className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-2 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+                  className="peer-focus:font-medium peer-focus:mt-2 absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-2 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
                 >
-                  Tên đăng nhập
+                  Email
                 </label>
               </div>
               <div className="relative z-0 w-full mb-8 group">
@@ -119,7 +125,7 @@ export default function Login() {
                 />
                 <label
                   htmlFor="password"
-                  className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-1 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+                  className="peer-focus:font-medium peer-focus:mt-2 absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-1 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
                 >
                   Mật khẩu
                 </label>
@@ -135,7 +141,10 @@ export default function Login() {
           <div className="flex justify-between text-xs text-black py-3">
             <p>
               Chưa có tài khoản?{" "}
-              <span onClick={() => router.push("/signup")} className="cursor-pointer font-medium text-blue-500">
+              <span
+                onClick={() => router.push("/signup")}
+                className="cursor-pointer font-medium text-blue-500"
+              >
                 Đăng ký
               </span>
             </p>

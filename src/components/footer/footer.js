@@ -10,17 +10,32 @@ const Footer = () => {
 
   useEffect(() => {
     setToken(localStorage.getItem("user-token"));
-  }, [])
-  
+  }, []);
+
   return (
     <>
-      <div className="min-[600px]:hidden flex flex-row justify-around w-screen fixed bottom-0 left-0 z-40 text-primary_color bg-white">
-        <div className="py-4"><Link href="/" className="hover:bg-gray-50">Trang chủ</Link></div>
-        <div className="py-4"><Link href={token ? "/profile" : "/login"} className="hover:bg-gray-50">Trang cá nhân</Link></div>
-        <div className="py-4"><Link href={token ? "/cart" : "/login"} className="hover:bg-gray-50">Giỏ hàng</Link></div>
+      <div className="min-[600px]:hidden w-full flex flex-row justify-around fixed bottom-0 left-0 z-40 text-primary_color bg-white">
+        <div className="py-4">
+          <Link href="/" className="hover:bg-gray-50">
+            Trang chủ
+          </Link>
+        </div>
+        <div className="py-4">
+          <Link
+            href={token ? "/profile" : "/login"}
+            className="hover:bg-gray-50"
+          >
+            Trang cá nhân
+          </Link>
+        </div>
+        <div className="py-4">
+          <Link href={token ? "/cart" : "/login"} className="hover:bg-gray-50">
+            Giỏ hàng
+          </Link>
+        </div>
       </div>
 
-      <div className="max-[600px]:hidden mx-24 p-4 bg-primary_color rounded-lg">
+      <div className="max-[600px]:hidden p-4 bg-primary_color rounded-lg">
         <div className="flex justify-between">
           <div className="w-1/6 space-y-1">
             <p className="font-bold text-[#ddd] cursor-pointer hover:text-white">
@@ -118,9 +133,8 @@ const Footer = () => {
         </div>
         <div className="text-center space-y-2 mt-8">
           <p className="text-xs font- text-[#ddd]">
-            Địa chỉ: Hà Nội, Việt Nam. Điện
-            thoại: 1900.1000. Chịu trách nhiệm nội dung:{" "}
-            <span className="text-white">Nguyễn Bòng Quyết</span>.
+            Địa chỉ: Hà Nội, Việt Nam. Điện thoại: 1900.1000. Chịu trách nhiệm
+            nội dung: <span className="text-white">Nguyễn Bòng Quyết</span>.
           </p>
         </div>
       </div>
