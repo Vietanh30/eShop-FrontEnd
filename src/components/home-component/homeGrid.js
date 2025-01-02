@@ -25,16 +25,16 @@ const HomeGrid = ({ product }) => {
           </p>
           <div className="flex justify-around items-center py-1">
             <p className="text-sm font-bold text-[#fd475a]">
-              {product.price.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") + " ₫"}{" "}
-              {/* Định dạng giá */}
+              {`${(
+                (parseInt(product.price, 10) * (100 - product.offer)) /
+                100
+              ).toLocaleString()} ₫`}{" "}
+              {/* Giá sau khuyến mãi */}
             </p>
             {product.offer && (
               <p className="text-xs text-primary_color line-through">
-                {`${(
-                  (parseInt(product.price, 10) * (100 - product.offer)) /
-                  100
-                ).toLocaleString()} ₫`}{" "}
-                {/* Giá sau khuyến mãi */}
+                {product.price.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") + " ₫"}{" "}
+                {/* Định dạng giá */}
               </p>
             )}
           </div>
