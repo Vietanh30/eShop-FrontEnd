@@ -54,7 +54,7 @@ export default function Login() {
     } else {
       Store.addNotification({
         title: "Đăng nhập thành công",
-        message: "Chào mừng đến với E-Mobile Shop",
+        message: "Chào mừng đến với WaterPurifier Shop",
         type: "success",
         insert: "top",
         container: "top-right",

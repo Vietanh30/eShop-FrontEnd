@@ -57,7 +57,7 @@ const Header = () => {
       <div className="min-[600px]:hidden">
         <div className="flex justify-between items-center mx-6 py-4">
           <Link href="/">
-            <Image src={logo} alt="E-Mobile Shop" />
+            <Image src={logo} alt="water purifier Shop" />
           </Link>
           <div className="w-[60%] relative">
             <input
@@ -129,7 +129,7 @@ const Header = () => {
         </div>
         <div className="flex justify-between items-center mx-24 py-4">
           <Link href="/">
-            <Image src={logo} alt="E-Mobile Shop" />
+            <Image src={logo} alt="water purifier Shop" />
           </Link>
           <div className="w-[45%] relative">
             <input

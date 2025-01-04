@@ -7,16 +7,17 @@ import avadefault from "../../image/login/avadefault.jpg";
 import { useEffect, useState } from "react";
 import { getProfile } from "../api/userApi";
 import { useRouter } from "next/navigation";
-import { getOrder } from "../api/orderApi";
+import { getOrder, cancelOrder } from "../api/orderApi";
 import wishlist from "../../image/cart/wishlist.png";
 import Error from "@/components/error/error";
 import Footer from "@/components/footer/footer";
+import Swal from "sweetalert2";
 
 const description = {
   fullname_des:
     "Tên của bạn xuất hiện trên trang cá nhân và bên cạnh các bình luận của bạn.",
   sex: "Giới tính của bạn Nam(M) / Nữ(F)",
-  phone_des: "Điện thoại kết nối với E-Mobile Shop.",
+  phone_des: "Điện thoại kết nối với WaterPurifier Shop.",
 };
 
 export default function Profile() {
@@ -33,10 +34,46 @@ export default function Profile() {
         setToken(userToken);
         const res = await getProfile(userToken);
         setUserInfo(res);
-        setOrders(await getOrder(userToken));
+        const updatedOrders = await getOrder(userToken);
+        setOrders(updatedOrders); // Lưu tất cả đơn hàng vào state
       }
     })();
   }, []);
+
+  const handleCancelOrder = async (orderId) => {
+    const confirmCancel = await Swal.fire({
+      title: "Bạn có chắc chắn muốn hủy đơn hàng này?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Hủy",
+      cancelButtonText: "Hủy",
+    });
+
+    if (confirmCancel.isConfirmed) {
+      try {
+        await cancelOrder(token, orderId);
+        showAlert("Hủy Thành Công", "Đơn hàng đã được hủy.", "success");
+        const updatedOrders = await getOrder(token);
+        setOrders(updatedOrders); // Cập nhật lại danh sách đơn hàng
+      } catch (error) {
+        showAlert("Lỗi", "Đã xảy ra lỗi khi hủy đơn hàng.", "error");
+      }
+    }
+  };
+
+  const showAlert = (title, text, icon) => {
+    Swal.fire({
+      title: title,
+      text: text,
+      icon: icon,
+      confirmButtonText: "OK",
+    });
+  };
+
+  // Lọc các đơn hàng không bị hủy
+  const filteredOrders = orders.filter(
+    (order) => order.paymentStatus !== "canceled"
+  );
 
   return token ? (
     <>
@@ -125,13 +162,13 @@ export default function Profile() {
           </div>
         ) : (
           <div className="max-[600px]:px-4 max-[600px]:pt-6 px-8 flex flex-col gap-y-4 max-[600px]:w-full w-[75%] mb-4">
-            {orders.length ? (
+            {filteredOrders.length ? (
               <div className="p-3 flex flex-col items-center">
                 <p className="font-primary text-primary_color text-2xl font-bold">
                   ĐƠN HÀNG
                 </p>
                 <div className="overflow-y-auto max-h-[400px] flex flex-col gap-4 mt-4 text-primary_color w-full">
-                  {orders.map((order) => (
+                  {filteredOrders.map((order) => (
                     <div
                       key={order._id}
                       className="border-b-2 border-gray-100 py-4"
@@ -151,7 +188,7 @@ export default function Profile() {
                             className="flex items-center border-b border-gray-200 py-2"
                           >
                             <Image
-                              src={item.product.image[0]} // Lấy hình ảnh đầu tiên
+                              src={item.product.image[0]}
                               alt={item.product.name}
                               width={50}
                               height={50}
@@ -174,6 +211,13 @@ export default function Profile() {
                           </div>
                         ))}
                       </div>
+
+                      <button
+                        className="mt-2 text-white bg-red-600 rounded px-4 py-2"
+                        onClick={() => handleCancelOrder(order._id)}
+                      >
+                        Hủy Đơn Hàng
+                      </button>
                     </div>
                   ))}
                 </div>

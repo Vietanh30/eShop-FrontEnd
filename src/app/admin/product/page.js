@@ -19,7 +19,11 @@ import {
   TablePagination,
   Paper,
 } from "@mui/material";
-import { createProduct, updateProduct } from "@/app/api/adminApi";
+import {
+  createProduct,
+  updateProduct,
+  deleteProduct,
+} from "@/app/api/adminApi"; // Import deleteProduct
 import Swal from "sweetalert2";
 import AddProductForm from "@/components/admin/AddProductForm";
 import EditProductForm from "@/components/admin/EditProductForm";
@@ -46,6 +50,7 @@ export default function AdminProduct() {
       setProducts(listProducts);
       setCategories(listCategories);
       setProductLength(listProducts.length);
+      console.log(listProducts);
     };
 
     fetchData();
@@ -54,12 +59,11 @@ export default function AdminProduct() {
   const handleOpenDialog = async (product = null) => {
     if (product) {
       try {
-        const productEdit = await getProductBySlug(product.slug); // Gọi hàm với await
+        const productEdit = await getProductBySlug(product.slug);
         setCurrentProduct(productEdit);
-        console.log(productEdit);
       } catch (error) {
         showAlert("Lỗi", "Không thể tải sản phẩm.", "error");
-        return; // Thoát nếu có lỗi
+        return;
       }
     } else {
       setCurrentProduct(null);
@@ -91,13 +95,33 @@ export default function AdminProduct() {
         showAlert("Thêm Thành Công", "Sản phẩm mới đã được thêm.", "success");
       }
 
-      // Fetch lại danh sách sản phẩm sau khi thành công
       await reloadProducts();
     } catch (error) {
       showAlert("Lỗi", "Đã xảy ra lỗi khi thực hiện thao tác.", "error");
     }
 
     handleCloseDialog();
+  };
+
+  const handleDeleteProduct = async (productId) => {
+    const confirmDelete = await Swal.fire({
+      title: "Bạn có chắc chắn muốn xóa sản phẩm này?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Xóa",
+      cancelButtonText: "Hủy",
+    });
+
+    if (confirmDelete.isConfirmed) {
+      try {
+        const res = await deleteProduct(productId, token);
+        console.log(res);
+        showAlert("Xóa Thành Công", "Sản phẩm đã được xóa.", "success");
+        await reloadProducts();
+      } catch (error) {
+        showAlert("Lỗi", "Đã xảy ra lỗi khi xóa sản phẩm.", "error");
+      }
+    }
   };
 
   const showAlert = (title, text, icon) => {
@@ -175,6 +199,14 @@ export default function AdminProduct() {
                           >
                             Sửa
                           </Button>
+                          <Button
+                            variant="outlined"
+                            color="secondary"
+                            onClick={() => handleDeleteProduct(item._id)}
+                            style={{ marginLeft: "8px" }}
+                          >
+                            Xóa
+                          </Button>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -196,7 +228,6 @@ export default function AdminProduct() {
             />
           </div>
 
-          {/* Dialog for Adding/Editing Product */}
           <Dialog
             open={openDialog}
             onClose={handleCloseDialog}

@@ -82,3 +82,20 @@ export const updateStatus = async (token, status, orderId) => {
     return error.response.data;
   }
 };
+export const cancelOrder = async (token, orderId) => {
+  console.log(token, orderId);
+  try {
+    const res = await axios({
+      method: "post",
+      url: `${host}/api/order/cancel/${orderId}`,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    console.log(res);
+    return res;
+  } catch (error) {
+    return error.response.data;
+  }
+};

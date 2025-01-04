@@ -37,7 +37,7 @@ export default function SignUp() {
 
     const notification = {
       title: res.message ? "Đăng ký thất bại" : "Đăng ký thành công",
-      message: res.message || "Chào mừng đến với E-Mobile Shop",
+      message: res.message || "Chào mừng đến với WaterPurifier Shop",
       type: res.message ? "danger" : "success",
       insert: "top",
       container: "top-right",

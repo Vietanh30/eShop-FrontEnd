@@ -70,3 +70,20 @@ export const updateProduct = async (id, token, formValue) => {
     return error.response.data;
   }
 };
+
+export const deleteProduct = async (id, token) => {
+  try {
+    const res = await axios({
+      method: "post",
+      url: `${host}/api/product/delete/${id}`, // Sửa lại URL (bỏ dấu } thừa)
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data", // Cập nhật Content-Type
+      },
+    });
+    console.log("response delete::", res);
+    return res.data;
+  } catch (error) {
+    return error.response.data;
+  }
+};
